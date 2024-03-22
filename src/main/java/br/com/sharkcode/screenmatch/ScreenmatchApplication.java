@@ -1,5 +1,6 @@
 package br.com.sharkcode.screenmatch;
 
+import br.com.sharkcode.screenmatch.models.DadosEpisodio;
 import br.com.sharkcode.screenmatch.models.DadosSerie;
 import br.com.sharkcode.screenmatch.services.ConsumoApi;
 import br.com.sharkcode.screenmatch.services.ConverteDados;
@@ -17,13 +18,14 @@ public class ScreenmatchApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         var consumoApi = new ConsumoApi();
+
         var json = consumoApi.obterDados("https://www.omdbapi.com/?t=gilmore+girls&apikey=230c22ac");
-        System.out.println(json);
-
         ConverteDados conversor = new ConverteDados();
-
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-
         System.out.println(dados);
+
+        json = consumoApi.obterDados("https://www.omdbapi.com/?t=gilmore+girls&season=1&episode=2&apikey=230c22ac");
+        DadosEpisodio dadosEpisodio = conversor.obterDados(json, DadosEpisodio.class);
+        System.out.println(dadosEpisodio);
     }
 }
