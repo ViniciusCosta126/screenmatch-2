@@ -7,6 +7,9 @@ import br.com.sharkcode.screenmatch.models.Episodio;
 import br.com.sharkcode.screenmatch.services.ConsumoApi;
 import br.com.sharkcode.screenmatch.services.ConverteDados;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -41,21 +44,35 @@ public class Principal {
         temporadas.forEach(t -> t.episodios().forEach(e -> System.out.println(e.titutlo())));
 
         List<DadosEpisodio> dadosEpisodios = temporadas.stream()
-                .flatMap(t-> t.episodios().stream())
+                .flatMap(t -> t.episodios().stream())
                 .collect(Collectors.toList());
 
         System.out.println("\n Top 5 episodios");
         dadosEpisodios.stream()
-                .filter(e-> !e.avaliacao().equalsIgnoreCase("N/A"))
+                .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
                 .sorted(Comparator.comparing(DadosEpisodio::avaliacao).reversed())
                 .limit(5)
                 .forEach(System.out::println);
 
         List<Episodio> episodios = temporadas.stream()
-                .flatMap(t->t.episodios().stream()
+                .flatMap(t -> t.episodios().stream()
                         .map(d -> new Episodio(t.temporada(), d)))
                 .collect(Collectors.toList());
 
         episodios.forEach(System.out::println);
+
+        System.out.println("A partir de que ano voce deseja ver os episódios: ");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+
+        LocalDate dataBusca = LocalDate.of(ano, 1, 1);
+
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        episodios.stream()
+                .filter(e -> e.getDataLancamento() != null && e.getDataLancamento().isAfter(dataBusca))
+                .forEach(e -> System.out.println(
+                        "Temporada: " + e.getTemporada() + " | Episodio: " + e.getTitulo() + " | Data Lançamento: " + e.getDataLancamento().format(formatador)
+                ));
     }
 }
